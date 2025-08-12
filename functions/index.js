@@ -28,5 +28,100 @@ setGlobalOptions({ maxInstances: 10 });
 
 exports.helloWorld = onRequest((request, response) => {
     console.log(request);
-  response.send("Hello from Firebase! " + request.body.test);
+  response.status(200).send("Hello "+request.body.name+"! This is from Firebase!");
+});
+
+exports.signUp = onRequest((req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  var code = 200; //start asumming no error, change if error occurs
+
+  //sign up logic
+
+  res.status(code).send();
+});
+
+exports.login = onRequest((req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  var code = 200; //start asumming no error, change if error occurs
+
+  //log in logic
+
+  res.status(code).send();
+});
+
+exports.refresh = onRequest((req,res)=>{
+  const refreshToken = req.body.refreshToken;
+  var code = 200;
+
+  //refresh token logic
+
+  res.status(code).send();
+});
+
+exports.getWeather = onRequest((req,res)=>{
+  const idToken = req.body.idToken;
+  const weekly = req.body.weekly;
+  var code = 200;
+
+  //verify token logic (return uid)
+
+  //get weather logic
+  if(uid){ //continue if token valid
+    //get user prefs.
+
+    //make api call
+    if(weekly){
+      //weekly api call
+
+    }else{
+      //current api call
+
+    }
+  }
+
+  res.status(code).send();
+});
+
+exports.getTodos = onRequest((req,res)=>{
+  const idToken = req.body.idToken;
+  var code = 200;
+
+  //verify token logic (return uid)
+
+  if(uid){ //continue if token valid
+    //get a key-value object of todos from database
+  }
+
+  res.status(code).send();
+});
+
+exports.addTodo = onRequest((req,res)=>{
+  const idToken = req.body.idToken;
+  const item = req.body.idToken;
+  var code = 200;
+
+  //verify token logic (return uid)
+
+  if(uid){ //continue if token valid
+    //add item to the database, give it a new id
+  }
+
+  res.status(code).send();
+});
+
+exports.removeTodo = onRequest((req,res)=>{
+  const idToken = req.body.idToken;
+  const itemId = req.body.itemId;
+  var code = 200;
+
+  //verify login logic (return uid)
+
+  if(uid){ //continue if token vaild
+    //get todos, compare ids with given one. If there's a match get rid of it and update database
+    //return updated todos
+  }
+
+  res.status(code).send();
 });
