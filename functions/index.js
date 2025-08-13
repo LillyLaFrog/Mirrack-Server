@@ -6,8 +6,8 @@
  *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
-
-const {setGlobalOptions} = require("firebase-functions");
+require('dotenv').config()
+const {setGlobalOptions, https} = require("firebase-functions");
 const {onRequest} = require("firebase-functions/https");
 const logger = require("firebase-functions/logger");
 
@@ -60,28 +60,41 @@ exports.refresh = onRequest((req,res)=>{
   res.status(code).send();
 });
 
-exports.getWeather = onRequest((req,res)=>{
+exports.getWeather = onRequest( async(req,res)=>{
   const idToken = req.body.idToken;
   const weekly = req.body.weekly;
   var code = 200;
 
   //verify token logic (return uid)
+  const uid = idToken;
 
   //get weather logic
-  if(uid){ //continue if token valid
-    //get user prefs.
+  if(uid != undefined){ //continue if token valid
+    apiKey=process.env.PIRATE_WEATHER_API_KEY;
+    //get user prefs. using idToken and uid
+    lat = 41.03;
+    lng = -111.92;
+    units = 'us';
 
-    //make api call
-    if(weekly){
-      //weekly api call
-
+    weatherRequest = `https://api.pirateweather.net/forecast/${apiKey}/${lat},${lng}?&units=${units}`;
+    //make api weather call
+    if(weekly == "true"){
+      //weekly (exclude everything but daily, gives array of 7 days)
+      weatherRequest += "&exclude=hourly,minutely,currently,alerts,flags";
     }else{
-      //current api call
-
+      //current (exclude everything but currently (and daily for temp high and temp low))
+      weatherRequest += `&exclude=hourly,minutely,alerts,flags`;
     }
+    weatherResponse = await fetch(weatherRequest);
+    json = await weatherResponse.json()
+    data = (weekly == "true")?json.daily:{...json.currently,temperatureMax:json.daily.data[0].temperatureMax, temperatureMin: json.daily.data[0].temperatureMin, units: units};
+  }
+  else{
+    code = 401;
+    data = {code:"unauthorized"}
   }
 
-  res.status(code).send();
+  res.status(code).send(data);
 });
 
 exports.getTodos = onRequest((req,res)=>{
