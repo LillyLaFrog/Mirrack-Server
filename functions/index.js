@@ -26,40 +26,6 @@ setGlobalOptions({ maxInstances: 10 });
 // Create and deploy your first functions
 // https://firebase.google.com/docs/functions/get-started
 
-exports.helloWorld = onRequest((request, response) => {
-    console.log(request);
-  response.status(200).send("Hello "+request.body.name+"! This is from Firebase!");
-});
-
-exports.signUp = onRequest((req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  var code = 200; //start asumming no error, change if error occurs
-
-  //sign up logic
-
-  res.status(code).send();
-});
-
-exports.login = onRequest((req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  var code = 200; //start asumming no error, change if error occurs
-
-  //log in logic
-
-  res.status(code).send();
-});
-
-exports.refresh = onRequest((req,res)=>{
-  const refreshToken = req.body.refreshToken;
-  var code = 200;
-
-  //refresh token logic
-
-  res.status(code).send();
-});
-
 exports.getWeather = onRequest( async(req,res)=>{
   const idToken = req.body.idToken;
   const weekly = req.body.weekly;
