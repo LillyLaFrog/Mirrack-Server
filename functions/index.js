@@ -6,10 +6,11 @@
  *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
-require('dotenv').config()
+require('dotenv').config();
 const {setGlobalOptions, https} = require("firebase-functions");
 const {onRequest} = require("firebase-functions/https");
 const logger = require("firebase-functions/logger");
+const { firebaseConfig } = require('firebase-functions/v1');
 
 // For cost control, you can set the maximum number of containers that can be
 // running at the same time. This helps mitigate the impact of unexpected
@@ -32,17 +33,33 @@ exports.getWeather = onRequest( async(req,res)=>{
   var code = 200;
 
   //verify token logic (return uid)
-  const uid = idToken;
+  const authApiKey = process.env.AUTH_API_KEY;
+  firebaseRequest = `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${authApiKey}`;
+
+  const postData = {idToken: idToken};
+
+  firebaseResponse = await fetch(firebaseRequest, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(postData) // Convert the JavaScript object to a JSON string
+  })
+  if(!firebaseResponse.ok){
+    res.status(firebaseResponse.status).send();
+    return;
+  }
+  fbJson = await firebaseResponse.json()
+  const uid = fbJson.users[0].localId;
 
   //get weather logic
   if(uid != undefined){ //continue if token valid
-    apiKey=process.env.PIRATE_WEATHER_API_KEY;
+    const weatherApiKey=process.env.PIRATE_WEATHER_API_KEY;
     //get user prefs. using idToken and uid
+    //todo get these values from RTDB
     lat = 41.03;
     lng = -111.92;
     units = 'us';
 
-    weatherRequest = `https://api.pirateweather.net/forecast/${apiKey}/${lat},${lng}?&units=${units}`;
+    weatherRequest = `https://api.pirateweather.net/forecast/${weatherApiKey}/${lat},${lng}?&units=${units}`;
     //make api weather call
     if(weekly == "true"){
       //weekly (exclude everything but daily, gives array of 7 days)
